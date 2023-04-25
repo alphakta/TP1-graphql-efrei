@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model editors {
+  idEditors   Int     @id @default(autoincrement())
+  nameEditors String  @db.VarChar(50)
+  games       games[]
+}
+
+model games {
+  idGames   Int     @id @default(autoincrement())
+  nameGames String  @db.VarChar(50)
+  idEditors Int
+  editors   editors @relation(fields: [idEditors], references: [idEditors], onDelete: NoAction, onUpdate: NoAction, map: "games_ibfk_1")
+  stock     stock[]
+
+  @@index([idEditors], map: "idEditors")
+}
+
+model stock {
+  idStock  Int    @id @default(autoincrement())
+  idGames  Int
+  idStores Int
+  units    Int
+  prices   Float? @db.Float
+  games    games  @relation(fields: [idGames], references: [idGames], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
+  stores   stores @relation(fields: [idStores], references: [idStores], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
+
+  @@index([idGames], map: "idGames")
+  @@index([idStores], map: "idStores")
+}
+
+model stores {
+  idStores   Int     @id @default(autoincrement())
+  nameStores String  @db.VarChar(75)
+  stock      stock[]
+}
